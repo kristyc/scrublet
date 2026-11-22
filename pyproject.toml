@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scrublet-pii"
-version = "0.7.1"
+version = "0.8.0"
 description = "Little scrubber, big privacy: keep private words out of what apps send to AI."
 readme = "README.md"
 license = "Apache-2.0"
@@ -34,7 +34,7 @@ bench-presidio = ["presidio-analyzer", "spacy"]
 
 [project.scripts]
 scrublet = "scrublet_pii.terms:main"
-tacitkit = "scrublet_pii.terms:main"   # deprecated alias, removed in v0.8.0
+tacitkit = "scrublet_pii.terms:main"   # deprecated alias, removed in v0.9.0 (ADR 0007)
 
 [tool.setuptools.packages.find]
 where = ["src"]

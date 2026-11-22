@@ -10,7 +10,8 @@ test corpus protect all of them. The Python package is `scrublet-pii`; you impor
 ## What it does
 
 - **A shared word store** (`terms`): one JSON file in the user's config folder. Every app on
-  the machine reads and writes the same never-send and always-OK lists, plus read-only *name
+  the machine reads and writes the same never-send, always-OK and always-hide lists, the
+  owner's own patterns, plus read-only *name
   sources* such as the cardholder field of another app's config file. Writes are locked and
   atomic; a damaged store is reported, never overwritten. See [ADR 0001](docs/adr/0001-global-word-store.md).
 - **Hard detectors** (`patterns`, `fold`): keys and secrets, cards, ID numbers, passports, bank
@@ -41,7 +42,7 @@ pip install scrublet-pii
 Until it is on PyPI, install from Git:
 
 ```
-pip install "git+https://github.com/kristyc/scrublet.git@v0.7.1"
+pip install "git+https://github.com/kristyc/scrublet.git@v0.8.0"
 ```
 
 Optional extras (only the adapter you run imports them): `bench-onnx`, `bench-torch`,
@@ -62,6 +63,21 @@ found = terms.read()                            # raises terms.Unreadable if the
 found.words("never_send")                       # ("Alex Example",)
 terms.names(found)                              # names from registered sources, fullest first
 terms.problems()                                # {} when all is well; counts and ids only
+```
+
+**Always hide and your own patterns.** `always_hide` words are hidden on private paths but never
+block a send (`never_send` is for words that must not leave at all). A pattern teaches the
+library a number format it doesn't know, from one example or a small regex
+([ADR 0007](docs/adr/0007-always-hide-and-custom-patterns.md)):
+
+```python
+from scrublet_pii import custom, terms
+
+terms.update("always_hide", add=["Sam Recipient"])
+shape = custom.shape_of("ab-123456")            # "AA-999999"
+found = terms.add_pattern(shape)                # stored once; .id removes it later
+custom.compile_pattern(found.kind, found.text).search("policy QX-482913")   # a match
+terms.remove_pattern(found.id)
 ```
 
 **Hard detectors.** Value-free names for what was found:
@@ -145,7 +161,7 @@ before you rely on one.
 
 ## Renamed from tacitkit
 
-scrublet was called tacitkit before v0.7.0. For one more version (removed in v0.8.0):
+scrublet was called tacitkit before v0.7.0. For one more version (removed in v0.9.0, ADR 0007):
 
 - `import tacitkit` still works and gives the same modules, with a deprecation warning;
 - `TACITKIT_HOME` is still read, with a deprecation warning (`SCRUBLET_HOME` wins);

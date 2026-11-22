@@ -1,4 +1,5 @@
-"""One word store for every app: never-send words, always-OK words and name sources (ADR 0001).
+"""One word store for every app: never-send words, always-OK words, always-hide words, the owner's
+own patterns and name sources (ADR 0001, ADR 0007).
 
 The store is one JSON file in the user's config folder. Every change goes through change():
 lock, re-read, edit, then write a temp file that os.replace swaps in. A missing store is an
@@ -9,6 +10,7 @@ and no error or output carries a word.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import json
 import os
 import re
@@ -22,8 +24,14 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import NamedTuple
 
-SCHEMA = 1
-LISTS = ("never_send", "always_ok")
+from . import custom
+from .custom import Pattern
+
+SCHEMA = 1  # what a store without the newer lists writes
+SCHEMA_WITH_HIDE = 2  # written once the store holds always-hide words or custom patterns
+READABLE = (SCHEMA, SCHEMA_WITH_HIDE)
+LISTS = ("never_send", "always_ok", "always_hide")
+MAX_PATTERNS = 50
 GENERAL = "general"
 MAX_CHARS = 200
 LOCK_SECONDS = 10.0
@@ -61,11 +69,16 @@ class Source(NamedTuple):
 class Terms:
     never_send: tuple[Word, ...] = ()
     always_ok: tuple[Word, ...] = ()
+    always_hide: tuple[Word, ...] = ()
+    custom_patterns: tuple[Pattern, ...] = ()
     sources: tuple[Source, ...] = ()
     imports: tuple[str, ...] = ()
 
     def words(self, name: str, scope: str = GENERAL) -> tuple[str, ...]:
         return tuple(word.text for word in getattr(self, _list(name)) if word.scope == scope)
+
+    def patterns(self, scope: str = GENERAL) -> tuple[Pattern, ...]:
+        return tuple(item for item in self.custom_patterns if item.scope == scope)
 
 
 class NotProduction(RuntimeError):
@@ -230,7 +243,7 @@ def _strings(value, what: str) -> tuple[str, ...]:
 
 def _parse(raw) -> Terms:
     what = "store"
-    if type(raw) is not dict or raw.get("schema") != SCHEMA:
+    if type(raw) is not dict or raw.get("schema") not in READABLE:
         raise Unreadable(what)
     lists = {}
     for name in LISTS:
@@ -258,16 +271,64 @@ def _parse(raw) -> Terms:
         ):
             raise Unreadable(what)
         sources.append(Source(entry["id"], entry["path"], _strings(entry.get("fields", []), what)))
-    return Terms(**lists, sources=tuple(sources), imports=_strings(raw.get("imports", []), what))
+    return Terms(
+        **lists,
+        custom_patterns=_parse_patterns(raw.get("custom_patterns", []), what),
+        sources=tuple(sources),
+        imports=_strings(raw.get("imports", []), what),
+    )
+
+
+def _parse_patterns(entries, what: str) -> tuple[Pattern, ...]:
+    """Stored patterns are checked again on every read: a damaged or hand-edited entry makes the
+    store unreadable (private content is held), never a pattern that was not vetted."""
+    if type(entries) is not list or len(entries) > MAX_PATTERNS:
+        raise Unreadable(what)
+    found = []
+    for entry in entries:
+        if (
+            type(entry) is not dict
+            or any(type(entry.get(key)) is not str for key in ("id", "kind", "text"))
+            or type(entry.get("scope", GENERAL)) is not str
+            or type(entry.get("at", "")) is not str
+        ):
+            raise Unreadable(what)
+        item = Pattern(
+            entry["id"],
+            entry["kind"],
+            entry["text"],
+            entry.get("scope", GENERAL),
+            entry.get("at", ""),
+        )
+        try:
+            custom.compile_pattern(item.kind, item.text)
+        except custom.Invalid:
+            raise Unreadable(what) from None
+        found.append(item)
+    return tuple(found)
 
 
 def _dump(terms: Terms) -> dict:
+    # An older library refuses schema 2 (it would drop the newer lists on its next write), so the
+    # newer schema is written only once the owner has actually used the newer lists.
+    newer = bool(terms.always_hide or terms.custom_patterns)
     return {
-        "schema": SCHEMA,
+        "schema": SCHEMA_WITH_HIDE if newer else SCHEMA,
         **{
             name: [{"text": w.text, "scope": w.scope} for w in getattr(terms, name)]
             for name in LISTS
+            if name != "always_hide" or newer
         },
+        **(
+            {
+                "custom_patterns": [
+                    {"id": i.id, "kind": i.kind, "text": i.text, "scope": i.scope, "at": i.at}
+                    for i in terms.custom_patterns
+                ]
+            }
+            if newer
+            else {}
+        ),
         "sources": [{"id": s.id, "path": s.path, "fields": list(s.fields)} for s in terms.sources],
         "imports": list(terms.imports),
     }
@@ -374,21 +435,20 @@ def _with_words(
     gone = {_key(text) for text in remove}
     kept = [w for w in getattr(terms, name) if not (w.scope == scope and _key(w.text) in gone)]
     have = {_key(w.text) for w in kept if w.scope == scope}
-    blocked = (
-        {_key(w.text) for w in terms.never_send if w.scope == scope}
-        if name == "always_ok"
-        else set()
-    )
+    never = {_key(w.text) for w in terms.never_send if w.scope == scope}
+    hidden = {_key(w.text) for w in terms.always_hide if w.scope == scope}
     added = 0
     for text in add:
-        if _key(text) in blocked:
+        if name == "always_ok" and _key(text) in never:
             raise Refused("that word is on the never-send list, which always wins")
+        if name == "always_ok" and _key(text) in hidden:
+            raise Refused("that word is on the always-hide list, which wins over always-OK")
         if _key(text) not in have:
             kept.append(Word(text, scope))
             have.add(_key(text))
             added += 1
     terms = replace(terms, **{name: tuple(kept)})
-    if name == "never_send":  # never-send wins: the same word leaves always-OK
+    if name in {"never_send", "always_hide"}:  # hiding wins: the same word leaves always-OK
         terms = replace(
             terms,
             always_ok=tuple(
@@ -411,6 +471,47 @@ def update(
     adding = [_clean(text) for text in add]
     removing = [text for text in remove if type(text) is str]
     return change(lambda terms: _with_words(terms, name, scope, adding, removing)[0], path)
+
+
+def add_pattern(
+    text: str,
+    kind: str = "shape",
+    scope: str = GENERAL,
+    path: Path | str | None = None,
+) -> Pattern:
+    """Store one of the owner's own patterns (ADR 0007): a shape such as "AA-999999" (see
+    `custom.shape_of`) or a bounded regex. Checked before anything is written; the same
+    pattern added twice is one pattern. Raises `custom.Invalid` or `Refused`, never the text."""
+    text = text.strip() if type(text) is str else text
+    custom.compile_pattern(kind, text)  # raises Invalid
+    if type(scope) is not str or not scope or len(scope) > 40:
+        raise Refused("a scope is 1 to 40 characters")
+    identity = "p-" + hashlib.sha256(f"{kind}\0{scope}\0{text}".encode()).hexdigest()[:12]
+    item = Pattern(identity, kind, text, scope, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
+    stored: list[Pattern] = []
+
+    def edit(terms: Terms) -> Terms:
+        known = next((i for i in terms.custom_patterns if i.id == identity), None)
+        if known is not None:
+            stored.append(known)
+            return terms
+        if len(terms.custom_patterns) >= MAX_PATTERNS:
+            raise Refused(f"at most {MAX_PATTERNS} patterns")
+        stored.append(item)
+        return replace(terms, custom_patterns=(*terms.custom_patterns, item))
+
+    change(edit, path)
+    return stored[0]
+
+
+def remove_pattern(pattern_id: str, path: Path | str | None = None) -> Terms:
+    """Remove one pattern by its id. An unknown id changes nothing."""
+    return change(
+        lambda terms: replace(
+            terms, custom_patterns=tuple(i for i in terms.custom_patterns if i.id != pattern_id)
+        ),
+        path,
+    )
 
 
 def register_source(
@@ -558,8 +659,9 @@ def _legacy_changed() -> bool:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """scrublet status | import-words <file> --id <id> [--list always_ok]. Counts only. Running it
-    is an operator action on the real store, so it declares production (a test run still can't)."""
+    """scrublet status | import-words <file> --id <id> [--list always_ok|always_hide]. Counts only.
+    Running it is an operator action on the real store, so it declares production (a test run
+    still can't)."""
     production()
     arguments = list(sys.argv[1:] if argv is None else argv)
     out = sys.stdout.write
@@ -576,6 +678,7 @@ def main(argv: list[str] | None = None) -> int:
         known = 0 if "unreadable" in issues.values() else len(names(terms))
         out(
             f"Word store: {len(terms.never_send)} never-send, {len(terms.always_ok)} always-OK, "
+            f"{len(terms.always_hide)} always-hide, {len(terms.custom_patterns)} patterns, "
             f"{len(terms.sources)} name sources ({known} names).\n"
         )
         for source_id, issue in sorted(issues.items()):
@@ -591,7 +694,8 @@ def main(argv: list[str] | None = None) -> int:
         out(f"Imported {added} new words.\n")
         return 0
     out(
-        "Use: scrublet_pii status | scrublet_pii import-words <file> --id <id> [--list always_ok]\n"
+        "Use: scrublet_pii status | scrublet_pii import-words <file> --id <id> "
+        "[--list always_ok|always_hide]\n"
     )
     return 2
 
