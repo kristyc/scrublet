@@ -166,9 +166,14 @@ def table(header: list[str], rows: list[list[str]]) -> str:
     )
 
 
+def _best(row: Row) -> tuple[float, float]:
+    """Most names caught first; among equals (to a tenth of a point) the one using less memory."""
+    return (-round(row.scores.caught, 1), row.scores.ram_peak_mb)
+
+
 def recommendation(rows: list[Row], baseline: str) -> str:
     contenders = [r for r in rows if r.spec.name != baseline]
-    adopted = sorted((r for r in contenders if r.adopted), key=lambda r: -r.scores.caught)
+    adopted = sorted((r for r in contenders if r.adopted), key=_best)
     if adopted:
         top = adopted[0]
         return (
@@ -343,7 +348,11 @@ def result_json(
     """The machine-readable record: model, revision, precision, scores per category, RAM, speed,
     licence and the decision. No raw text and no per-case data."""
     adopted = [r for r in rows if r.adopted]
-    winner = max(adopted, key=lambda r: r.scores.caught).spec.name if adopted else None
+    winner = (
+        max(adopted, key=lambda r: (round(r.scores.caught, 1), -r.scores.ram_peak_mb)).spec.name
+        if adopted
+        else None
+    )
     models = []
     for r in rows:
         s = r.scores
@@ -369,6 +378,7 @@ def result_json(
                 "speed_vs_baseline_same_precision": r.speed_x,
                 "ram_peak_mb": round(s.ram_peak_mb),
                 "ram_after_load_mb": round(s.ram_load_mb),
+                "imports_torch": s.imports_torch,
                 "per_category": s.per_category,
                 "rules": r.passes,
                 "adopted": r.adopted,

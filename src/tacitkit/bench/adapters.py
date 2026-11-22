@@ -277,13 +277,29 @@ for _variant, _label, _precision in (
     )
 
 
+SPECS["gliner_multi_pii_lean_emb8"] = Spec(
+    "gliner_multi_pii_lean_emb8",
+    "GLiNER multi PII v1 (lean runner, embedding table int8)",
+    "gliner_lean",
+    "fp32+emb8",
+    "Apache-2.0",
+    OK_OWN,
+    "6 European languages",
+    GLINER_PII,
+    GLINER_REV,
+    (),
+    {"labels": ["person"], "threshold": 0.5, "onnx_file": "model_emb8.onnx"},
+    "onnxruntime tokenizers numpy (no torch, no gliner package)",
+)
+
+
 def cache_folder(cache: Path, repo: str) -> Path:
     return cache / "hub" / ("models--" + repo.replace("/", "--"))
 
 
 def fetch(spec: Spec, cache: Path) -> Path | None:
     """Download the pinned files into `cache` (HF_HOME layout); returns the snapshot folder."""
-    if not spec.repo:
+    if not spec.repo or spec.kind == "gliner_lean":
         return None
     os.environ["HF_HOME"] = str(cache)
     if (
@@ -460,6 +476,24 @@ def _gliner_onnx(spec, cache, threads, truth):
     return _gliner_predict(model, spec)
 
 
+def _gliner_lean(spec, cache, threads, truth):
+    from tacitkit.models.gliner_onnx import GlinerOnnx  # noqa: PLC0415
+
+    folder = cache / ONNX_DIR
+    if not (folder / spec.options["onnx_file"]).is_file():
+        raise SystemExit(
+            f"{spec.name}: run `python -m tacitkit.bench export-gliner --cache {cache}` first"
+        )
+    model = GlinerOnnx(
+        folder,
+        spec.options["onnx_file"],
+        tuple(spec.options["labels"]),
+        spec.options["threshold"],
+        threads,
+    )
+    return model.detect
+
+
 def _presidio(spec, cache, threads, truth):
     from presidio_analyzer import AnalyzerEngine  # noqa: PLC0415
     from presidio_analyzer.nlp_engine import NlpEngineProvider  # noqa: PLC0415
@@ -483,5 +517,6 @@ _LOADERS = {
     "hf_tagger": _hf_tagger,
     "gliner": _gliner,
     "gliner_onnx": _gliner_onnx,
+    "gliner_lean": _gliner_lean,
     "presidio": _presidio,
 }

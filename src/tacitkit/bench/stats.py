@@ -103,6 +103,7 @@ class Scores:
     flags: dict = field(default_factory=dict, repr=False)  # paired flags for p-values
     misses: list = field(default_factory=list, repr=False)  # (category, text)
     wrong: list = field(default_factory=list, repr=False)  # (text, fact)
+    imports_torch: bool | None = None  # did the run load torch (a "lean" runner must not)
 
 
 def score(cases: list[dict], run: dict, name_cats, fact_cats, asian_cats, ambiguous: str) -> Scores:
@@ -162,6 +163,7 @@ def score(cases: list[dict], run: dict, name_cats, fact_cats, asian_cats, ambigu
         ms_p95=ms[int(0.95 * len(ms))],
         ram_peak_mb=run["ram_peak_mb"],
         ram_load_mb=run["ram_load_mb"],
+        imports_torch=run.get("torch_loaded"),
         flags={"names": [ok for _, ok in names], "facts": [h for _, _, h in facts], "asian": asian},
         misses=[(c["category"], c["text"]) for c, ok in names if not ok],
         wrong=[(c["text"], f) for c, f, h in facts if h],

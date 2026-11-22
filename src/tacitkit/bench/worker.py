@@ -84,6 +84,7 @@ def run(model: str, cases: list[dict], cache: Path, threads: int) -> dict:
         "ram_load_mb": loaded,
         "ram_peak_mb": memory_mb()[1],
         "threads": threads,
+        "torch_loaded": "torch" in sys.modules,  # proves a "lean" adapter really is lean
     }
 
 

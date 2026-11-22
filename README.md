@@ -17,6 +17,11 @@ tacitkit is a small, dependency-free Python library that several apps can share:
   with a stated decision rule and a product-owner report. Results are kept under
   [bench/results](bench/results/README.md) ([ADR 0004](docs/adr/0004-bench-module.md)).
 
+- **models.gliner_onnx**: a lean runner for GLiNER multi PII v1 as ONNX (onnxruntime, tokenizers
+  and numpy only; no torch, no gliner package). Same answers as the gliner package on all 1,430
+  bench cases, about 1 GB at peak, and it reads texts past the package's 384-word limit in windows
+  ([ADR 0005](docs/adr/0005-lean-gliner-runner.md)).
+
 Coming next: tiers and policy helpers, and an interface for optional local name-finding models.
 
 ```python

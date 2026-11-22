@@ -1,0 +1,266 @@
+{
+ "title": "Lean GLiNER runner: parity with the gliner package",
+ "date": "2026-11-22",
+ "baseline": "gliner_multi_pii_onnx_emb8",
+ "rule": {
+  "min_gain_points": null,
+  "min_caught": 77.5,
+  "min_asian": 95,
+  "min_asian_gain": null,
+  "max_extra_hidden": null,
+  "max_hidden": 2.5,
+  "max_ram_mb": 1500,
+  "max_median_ms": null,
+  "max_p95_ms": 300
+ },
+ "corpus": {
+  "hash": "f15659ceeaf0ffa1",
+  "n": 1430,
+  "categories": 13,
+  "seed": 20261122
+ },
+ "threads": 2,
+ "host": {
+  "platform": "Windows-10-10.0.19044-SP0",
+  "python": "3.12.0",
+  "machine": "AMD64",
+  "cpus": 24
+ },
+ "winner": "gliner_multi_pii_lean_emb8",
+ "models": [
+  {
+   "model": "gliner_multi_pii_onnx_emb8",
+   "label": "GLiNER multi PII v1 (ONNX, embedding table int8 (maths fp32))",
+   "repo": "urchade/gliner_multi_pii-v1",
+   "revision": "1fcf13e85f4eef5394e1fcd406cf2ca9ea82351d",
+   "precision": "fp32+emb8",
+   "licence": "Apache-2.0",
+   "licence_consequence": "OK for personal and company use; can be bundled",
+   "names_caught_pct": 80.92,
+   "names_caught_ci": [
+    78.3,
+    83.3
+   ],
+   "asian_caught_pct": 100.0,
+   "wrongly_hidden_pct": 1.8,
+   "wrongly_hidden_ci": [
+    1.2,
+    2.7
+   ],
+   "shops_hidden_pct": 23.636363636363637,
+   "p_names_vs_baseline": null,
+   "p_hidden_vs_baseline": null,
+   "ms_median": 57.5,
+   "ms_p95": 80.5,
+   "speed_vs_baseline_same_precision": null,
+   "ram_peak_mb": 1315,
+   "ram_after_load_mb": 1136,
+   "imports_torch": true,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "malay": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "chinese": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "indian": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "allcaps": {
+     "caught": 73.63636363636364,
+     "n_names": 110,
+     "hidden": 0.0,
+     "n_facts": 173
+    },
+    "split_lines": {
+     "caught": 92.72727272727273,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "cut_off": {
+     "caught": 43.63636363636363,
+     "n_names": 110,
+     "hidden": 0.0,
+     "n_facts": 220
+    },
+    "glued": {
+     "caught": 40.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "organisations": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 0.0,
+     "n_facts": 110
+    },
+    "places": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 2.727272727272727,
+     "n_facts": 110
+    },
+    "statement_rows": {
+     "caught": 75.47169811320755,
+     "n_names": 53,
+     "hidden": 4.332129963898917,
+     "n_facts": 277
+    },
+    "facts_survive": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 2.121212121212121,
+     "n_facts": 330
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 23.636363636363637,
+     "n_facts": 110
+    }
+   },
+   "rules": {},
+   "adopted": false,
+   "is_baseline": true
+  },
+  {
+   "model": "gliner_multi_pii_lean_emb8",
+   "label": "GLiNER multi PII v1 (lean runner, embedding table int8)",
+   "repo": "urchade/gliner_multi_pii-v1",
+   "revision": "1fcf13e85f4eef5394e1fcd406cf2ca9ea82351d",
+   "precision": "fp32+emb8",
+   "licence": "Apache-2.0",
+   "licence_consequence": "OK for personal and company use; can be bundled",
+   "names_caught_pct": 80.92,
+   "names_caught_ci": [
+    78.3,
+    83.3
+   ],
+   "asian_caught_pct": 100.0,
+   "wrongly_hidden_pct": 1.8,
+   "wrongly_hidden_ci": [
+    1.2,
+    2.7
+   ],
+   "shops_hidden_pct": 23.636363636363637,
+   "p_names_vs_baseline": 1.0,
+   "p_hidden_vs_baseline": 1.0,
+   "ms_median": 58.5,
+   "ms_p95": 88.2,
+   "speed_vs_baseline_same_precision": null,
+   "ram_peak_mb": 1028,
+   "ram_after_load_mb": 846,
+   "imports_torch": false,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "malay": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "chinese": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "indian": {
+     "caught": 100.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "allcaps": {
+     "caught": 73.63636363636364,
+     "n_names": 110,
+     "hidden": 0.0,
+     "n_facts": 173
+    },
+    "split_lines": {
+     "caught": 92.72727272727273,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "cut_off": {
+     "caught": 43.63636363636363,
+     "n_names": 110,
+     "hidden": 0.0,
+     "n_facts": 220
+    },
+    "glued": {
+     "caught": 40.0,
+     "n_names": 110,
+     "hidden": null,
+     "n_facts": 0
+    },
+    "organisations": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 0.0,
+     "n_facts": 110
+    },
+    "places": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 2.727272727272727,
+     "n_facts": 110
+    },
+    "statement_rows": {
+     "caught": 75.47169811320755,
+     "n_names": 53,
+     "hidden": 4.332129963898917,
+     "n_facts": 277
+    },
+    "facts_survive": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 2.121212121212121,
+     "n_facts": 330
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "n_names": 0,
+     "hidden": 23.636363636363637,
+     "n_facts": 110
+    }
+   },
+   "rules": {
+    "names": true,
+    "asian": true,
+    "wrong_hides": true,
+    "ram": true,
+    "p95_speed": true
+   },
+   "adopted": true,
+   "is_baseline": false
+  }
+ ],
+ "decision": "adopt gliner_multi_pii_lean_emb8",
+ "name": "lean-parity",
+ "failed": {},
+ "report": "2026-11-22-lean-parity.md"
+}
