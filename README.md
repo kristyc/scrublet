@@ -41,7 +41,7 @@ pip install scrublet-pii
 Until it is on PyPI, install from Git:
 
 ```
-pip install "git+https://github.com/kristyc/scrublet.git@v0.7.0"
+pip install "git+https://github.com/kristyc/scrublet.git@v0.7.1"
 ```
 
 Optional extras (only the adapter you run imports them): `bench-onnx`, `bench-torch`,
@@ -159,7 +159,9 @@ scrublet was called tacitkit before v0.7.0. For one more version (removed in v0.
 
 Issues and pull requests are welcome.
 
-- Run `ruff check src tests` and `pytest` before you send a change. Tests must pass without any
+- Run `ruff check src tests` and `pytest` before you send a change, and `python tools/check_build.py`
+  before a release: it builds the sdist and wheel, installs each into a fresh venv and imports them
+  (needs `uv` or the `build` package; no CI required). Tests must pass without any
   model installed; tests that need one are skipped unless its folder is named in an environment variable.
 - **Synthetic data only.** The corpus, tests and bench results must hold no real person, account,
   number, employer or path. Use invented names and public test values.
