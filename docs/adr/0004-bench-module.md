@@ -50,3 +50,11 @@ The detector the apps use. The harness only reports; adoption stays each app's d
 - Whole-model int8 (gliner's own export, torch dynamic int8) breaks DeBERTa-family models: they
   find almost nothing. Quantise the embedding table only, or check quality before trusting speed.
 - Memory after loading understates the peak (fp32 GLiNER: 2.1 GB after load, 3.1 GB peak). Report peak.
+
+## Corpus revisions
+
+`corpus_hash` identifies the corpus a result was measured on. Revision `f15659ceeaf0ffa1`
+(used for the first runs, 2026-11-22) was replaced by `a3c5dd3dfeec8a34`, which swaps one sample
+place name for an invented one; 3 of 1,430 cases differ. Earlier results stay as recorded and
+keep their original hash, so they are comparable to later ones within noise but not reproducible
+byte for byte.

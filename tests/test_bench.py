@@ -20,7 +20,7 @@ def test_the_corpus_is_1430_cases_in_13_categories_of_110_and_always_the_same():
         counts[case["category"]] = counts.get(case["category"], 0) + 1
     assert len(counts) == 13 and set(counts.values()) == {110}
     assert cases.build() == CORPUS
-    assert cases.corpus_hash(CORPUS) == "f15659ceeaf0ffa1"
+    assert cases.corpus_hash(CORPUS) == "a3c5dd3dfeec8a34"
 
 
 def test_every_name_and_fact_sits_in_its_text_and_the_ids_are_unique():
@@ -242,7 +242,7 @@ def test_the_command_line_runs_fresh_processes_stores_the_result_and_removes_the
     assert "Oracle" in (tmp_path / "r.md").read_text(encoding="utf-8")
     (stored,) = list((tmp_path / "bench" / "results").glob("*.json"))
     record = json.loads(stored.read_text())
-    assert record["models"][1]["ram_peak_mb"] > 0 and record["corpus"]["hash"] == "f15659ceeaf0ffa1"
+    assert record["models"][1]["ram_peak_mb"] > 0 and record["corpus"]["hash"] == "a3c5dd3dfeec8a34"
     assert (tmp_path / "bench" / "results" / "README.md").is_file()
 
 

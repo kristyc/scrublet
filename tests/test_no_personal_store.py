@@ -13,9 +13,7 @@ GIT = shutil.which("git")
 
 
 def git(*args):
-    return subprocess.run(
-        [GIT, *args], cwd=ROOT, capture_output=True, text=True, check=False
-    )
+    return subprocess.run([GIT, *args], cwd=ROOT, capture_output=True, text=True, check=False)
 
 
 @pytest.mark.skipif(GIT is None or not (ROOT / ".git").exists(), reason="needs a git checkout")

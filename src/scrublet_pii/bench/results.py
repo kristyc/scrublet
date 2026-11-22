@@ -53,6 +53,10 @@ def index(folder: Path) -> Path:
         'decision rule; "none" means no model passed, and the numbers are then for the model the '
         "report picked (or the best by names caught if it picked none).",
         "",
+        "Corpus revisions: runs dated 2026-11-22 used corpus `f15659ceeaf0ffa1`. Revision "
+        "`a3c5dd3dfeec8a34` (the current one) replaces one sample place name with an invented one, "
+        "so those runs cannot be reproduced byte for byte; the two differ in 3 of 1,430 cases.",
+        "",
         "| Date | Run | Report | Corpus | Winner | Names caught | Asian | Wrongly hidden | p95 ms | Peak RAM MB | Models |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
