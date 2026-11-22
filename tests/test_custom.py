@@ -43,7 +43,7 @@ def test_a_shape_too_short_or_odd_is_refused(sample):
 
 
 @pytest.mark.parametrize(
-    "text", [r"[A-Z]{2}\d{6}", r"MEM-\d{4,8}", r"(?:ab|cd)\d{6}", r"\d+-\d+", r"[A-Z]\d{3}[a-z]?"]
+    "text", [r"[A-Z]{2}\d{6}", r"MEM-\d{4,8}", r"(?:ab|cd)\d{6}", r"[A-Z]-\d+", r"[A-Z]\d{3}[a-z]?"]
 )
 def test_simple_regexes_are_taken(text):
     assert custom.compile_pattern("regex", text).pattern == text
@@ -58,6 +58,8 @@ def test_simple_regexes_are_taken(text):
         r"(?i)abc123",  # flags
         r"(\d)\1\d{4}",  # backreference
         r"a*b*c*d*e*",  # too many unbounded repeats
+        r"\d+-\d+",  # two unbounded repeats can overlap (v0.8.1)
+        r"a+b+",
         r"\d{1,999}",  # a huge bound
         r"\d{5,2}",  # backwards bound
         r"a?b?c?d?e?x",  # too many quantifiers
@@ -76,7 +78,7 @@ def test_dangerous_or_empty_regexes_are_refused_without_quoting_them(text):
 
 
 def test_matching_a_long_hostile_input_stays_fast_for_every_accepted_pattern():
-    for text in (r"[A-Z]{2}\d{6}", r"\d+-\d+", r"a+b+", r"(?:x|y)\d+z+"):
+    for text in (r"[A-Z]{2}\d{6}", r"[A-Z]-\d+", r"a+b", r"(?:x|y)\d+z"):
         found = custom.compile_pattern("regex", text)
         started = time.perf_counter()
         found.search("a" * 5000 + "1" * 5000 + "-" * 5000)

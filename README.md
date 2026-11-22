@@ -42,7 +42,7 @@ pip install scrublet-pii
 Until it is on PyPI, install from Git:
 
 ```
-pip install "git+https://github.com/kristyc/scrublet.git@v0.8.0"
+pip install "git+https://github.com/kristyc/scrublet.git@v0.8.1"
 ```
 
 Optional extras (only the adapter you run imports them): `bench-onnx`, `bench-torch`,

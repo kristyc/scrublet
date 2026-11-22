@@ -39,8 +39,8 @@ store had two lists, and neither fits:
   match every pair of digits.
 - A **regex** is accepted only in a small grammar. Quantifiers apply to one character or class,
   never a group, so nested quantifiers cannot exist. Backreferences, lookaround, flags and
-  conditionals are refused. At most four quantifiers, at most two unbounded, repeat counts up to
-  64, at most 200 characters, and a pattern that can match nothing is refused. Matching is
+  conditionals are refused. At most four quantifiers, at most ONE unbounded (two can overlap and
+  make matching quadratic; v0.8.0 allowed two), repeat counts up to 64, at most 200 characters, and a pattern that can match nothing is refused. Matching is
   therefore polynomial of small degree, not exponential; a test pins a long hostile input.
 - Patterns are checked when added **and again on every read**. A hand-edited or damaged entry
   makes the store unreadable (private content is held), never an unvetted pattern.
