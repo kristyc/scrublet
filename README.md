@@ -13,6 +13,10 @@ tacitkit is a small, dependency-free Python library that several apps can share:
 - **printed**: one name matcher for messy printed text: split, cut off, glued, reordered,
   initials and markers ([ADR 0003](docs/adr/0003-printed-matcher.md)).
 
+- **bench**: a harness that compares local name-finding models on a labelled synthetic corpus,
+  with a stated decision rule and a product-owner report. Results are kept under
+  [bench/results](bench/results/README.md) ([ADR 0004](docs/adr/0004-bench-module.md)).
+
 Coming next: tiers and policy helpers, and an interface for optional local name-finding models.
 
 ```python
@@ -30,5 +34,30 @@ Command line (prints counts only, never a word):
 tacitkit status
 tacitkit import-words <path-to-a-json-list> --id <import-id>
 ```
+
+## Bench
+
+Compare name-finding models (optional extras; no weights in the repo):
+
+```
+python -m tacitkit.bench models                    # adapters, licences, what each needs
+python -m tacitkit.bench bakeoff --models current_ner,gliner_multi_pii --cache D:/models     --rule replace --name my-run --max-cpu 80
+python -m tacitkit.bench export-gliner --cache D:/models   # ONNX variants of GLiNER multi PII v1
+python -m tacitkit.bench results                   # rebuild the index of past runs
+```
+
+- Models download to `--cache` at pinned commits and are **removed afterwards** unless
+  `--keep-models`. Only what the run added is removed.
+- Each model runs alone in a fresh process, so peak memory is real. Speed is compared with the
+  baseline at the same precision (`current_ner` is int8, `current_ner_fp32` is fp32).
+- `--rule replace` (a clear gain, nothing lost) or `--rule slim` (stay near a full-size model's
+  numbers in less memory), or set any limit: `--min-caught`, `--min-asian`, `--max-hidden`,
+  `--max-ram-mb`, `--max-p95-ms` and the others.
+- Every run appends a report and a `.json` record to `bench/results/` and rebuilds its index
+  (`--no-store` to skip). The corpus and results are synthetic: no personal data.
+- Licence notes are per adapter. Non-commercial models can be tested for your own use; they
+  can't be bundled in a public library.
+- Add a model: add a `Spec` to `tacitkit/bench/adapters.py` with its pinned commit and licence
+  consequence, and a loader if its kind is new.
 
 Licence: Apache-2.0.

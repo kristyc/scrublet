@@ -14,6 +14,12 @@ dependencies = []
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+# bench adapters import these only when that adapter runs; nothing here is needed to import tacitkit
+bench-onnx = ["onnxruntime", "tokenizers", "numpy", "huggingface_hub"]
+bench-torch = ["torch", "transformers>=4.50,<5", "huggingface_hub", "protobuf", "sentencepiece"]
+bench-gliner = ["gliner", "torch", "transformers>=4.50,<5", "onnxruntime", "onnx", "onnxscript",
+                "huggingface_hub", "protobuf", "sentencepiece"]
+bench-presidio = ["presidio-analyzer", "spacy"]
 
 [project.scripts]
 tacitkit = "tacitkit.terms:main"
@@ -31,3 +37,7 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "PL", "RUF"]
 ignore = ["PLR2004"]
+
+[tool.ruff.lint.per-file-ignores]
+# the bench report and adapters are data-heavy: many parameters, long prose strings
+"src/tacitkit/bench/*" = ["E501", "PLR0912", "PLR0913", "PLR0915", "PLR0917"]

@@ -1,0 +1,1015 @@
+{
+ "title": "Privacy name-model bake-off",
+ "name": "bakeoff",
+ "date": "2026-11-22",
+ "baseline": "current_ner",
+ "corpus": {
+  "hash": "f15659ceeaf0ffa1",
+  "n": 1430,
+  "categories": 13,
+  "seed": 20261122
+ },
+ "threads": 2,
+ "host": {
+  "note": "Windows 10, 24 threads, PC busy with other work (60-95% CPU) during runs"
+ },
+ "rule": {
+  "min_gain_points": 10,
+  "min_asian_gain": 0,
+  "max_extra_hidden": 3,
+  "max_median_ms": 200,
+  "max_p95_ms": 500,
+  "max_ram_mb": 1500
+ },
+ "winner": null,
+ "decision": "pick GLiNER multi PII v1 for quality; switch waits on a slim form (no model passed the memory rule)",
+ "source": "reconstructed from the published report tables (remy docs/privacy-model-bakeoff.md); the run predates this module and per-case data was not kept; ram_after_load_mb is memory after loading, not peak; speed columns for challengers are fp32 torch against the baseline's int8 ONNX (not like-for-like)",
+ "models": [
+  {
+   "model": "current_ner",
+   "label": "Current: bert-base-NER (int8 ONNX)",
+   "repo": "Xenova/bert-base-NER",
+   "revision": "8e892123e8b7c2c0c2bd1dcb598b7d244c4e53aa",
+   "precision": "int8",
+   "licence": "MIT",
+   "licence_consequence": "OK for her projects; bundled today",
+   "names_caught_pct": 45.0,
+   "names_caught_ci": [
+    42,
+    48
+   ],
+   "asian_caught_pct": 78.2,
+   "wrongly_hidden_pct": 0.9,
+   "wrongly_hidden_ci": [
+    1,
+    2
+   ],
+   "shops_hidden_pct": 33.0,
+   "vs_baseline_names": "—",
+   "vs_baseline_hidden": "—",
+   "ms_median": 17,
+   "ms_p95": 27,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 230,
+   "per_category": {
+    "english": {
+     "caught": 99.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 95.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 60.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 79.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 37.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 11.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 4.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 4.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 1.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 33.0
+    }
+   },
+   "is_baseline": true
+  },
+  {
+   "model": "current_ner_with_places",
+   "label": "Current, places on too (production 'people' mode)",
+   "repo": "",
+   "revision": "",
+   "precision": "int8",
+   "licence": "MIT",
+   "licence_consequence": "same",
+   "names_caught_pct": 45.9,
+   "names_caught_ci": [
+    43,
+    49
+   ],
+   "asian_caught_pct": 79.1,
+   "wrongly_hidden_pct": 12.8,
+   "wrongly_hidden_ci": [
+    11,
+    15
+   ],
+   "shops_hidden_pct": 56.0,
+   "vs_baseline_names": "+0.9 pts (p=0.008)",
+   "vs_baseline_hidden": "+11.9 pts (p<0.001)",
+   "ms_median": 15,
+   "ms_p95": 26,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 230,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 97.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 60.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 80.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 2.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 38.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 11.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 2.0,
+     "hidden": 1.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 5.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 100.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 12.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 56.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "presidio",
+   "label": "Presidio + spaCy lg on top of current",
+   "repo": "",
+   "revision": "",
+   "precision": "fp32",
+   "licence": "MIT (Presidio, spaCy model)",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 60.3,
+   "names_caught_ci": [
+    57,
+    63
+   ],
+   "asian_caught_pct": 87.3,
+   "wrongly_hidden_pct": 7.4,
+   "wrongly_hidden_ci": [
+    6,
+    9
+   ],
+   "shops_hidden_pct": 68.0,
+   "vs_baseline_names": "+15.3 pts (p<0.001)",
+   "vs_baseline_hidden": "+6.5 pts (p<0.001)",
+   "ms_median": 23,
+   "ms_p95": 34,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 1176,
+   "per_category": {
+    "english": {
+     "caught": 99.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 73.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 89.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 29.0,
+     "hidden": 12.0
+    },
+    "split_lines": {
+     "caught": 53.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 20.0,
+     "hidden": 4.0
+    },
+    "glued": {
+     "caught": 33.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 34.0,
+     "hidden": 2.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 9.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 19.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 7.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 68.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "xlmr_ner_hrl",
+   "label": "XLM-R base NER-HRL (Davlan)",
+   "repo": "Davlan/xlm-roberta-base-ner-hrl",
+   "revision": "253f557bd8249b8515114cfd7f71974fe5fa4d2f",
+   "precision": "fp32",
+   "licence": "AFL-3.0 (permissive)",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 53.5,
+   "names_caught_ci": [
+    50,
+    57
+   ],
+   "asian_caught_pct": 87.0,
+   "wrongly_hidden_pct": 0.3,
+   "wrongly_hidden_ci": [
+    0,
+    1
+   ],
+   "shops_hidden_pct": 9.0,
+   "vs_baseline_names": "+8.5 pts (p<0.001)",
+   "vs_baseline_hidden": "-0.6 pts (noise)",
+   "ms_median": 85,
+   "ms_p95": 136,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 869,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 97.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 95.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 69.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 19.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 44.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 4.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 16.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 21.0,
+     "hidden": 0.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 1.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 2.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 0.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 9.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "deberta_h2oai",
+   "label": "DeBERTa PII (h2oai)",
+   "repo": "h2oai/deberta_finetuned_pii",
+   "revision": "68089cd67db0b937a48ef97b62673cfdde67cb83",
+   "precision": "fp32",
+   "licence": "MIT (training data not stated)",
+   "licence_consequence": "OK for her projects; bundling OK by its licence, data source unknown",
+   "names_caught_pct": 67.2,
+   "names_caught_ci": [
+    64,
+    70
+   ],
+   "asian_caught_pct": 90.9,
+   "wrongly_hidden_pct": 8.9,
+   "wrongly_hidden_ci": [
+    7,
+    11
+   ],
+   "shops_hidden_pct": 29.0,
+   "vs_baseline_names": "+22.2 pts (p<0.001)",
+   "vs_baseline_hidden": "+8.0 pts (p<0.001)",
+   "ms_median": 102,
+   "ms_p95": 142,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 663,
+   "per_category": {
+    "english": {
+     "caught": 98.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 99.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 75.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 99.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 42.0,
+     "hidden": 5.0
+    },
+    "split_lines": {
+     "caught": 79.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 7.0,
+     "hidden": 1.0
+    },
+    "glued": {
+     "caught": 62.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 19.0,
+     "hidden": 2.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 49.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 17.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 6.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 29.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "deberta_ai4privacy",
+   "label": "DeBERTa-v3 ai4privacy v2 (Isotonic)",
+   "repo": "Isotonic/deberta-v3-base_finetuned_ai4privacy_v2",
+   "revision": "9814d1113e03f72e8d383423188a51b43d5534c9",
+   "precision": "fp32",
+   "licence": "CC-BY-NC-4.0 (non-commercial)",
+   "licence_consequence": "OK for her own projects; can't be bundled in the public library (optional download she enables)",
+   "names_caught_pct": 58.2,
+   "names_caught_ci": [
+    55,
+    61
+   ],
+   "asian_caught_pct": 83.9,
+   "wrongly_hidden_pct": 2.4,
+   "wrongly_hidden_ci": [
+    2,
+    3
+   ],
+   "shops_hidden_pct": 38.0,
+   "vs_baseline_names": "+13.2 pts (p<0.001)",
+   "vs_baseline_hidden": "+1.5 pts (p=0.004)",
+   "ms_median": 179,
+   "ms_p95": 232,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 694,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 67.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 97.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 87.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 26.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 59.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 8.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 39.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 19.0,
+     "hidden": 1.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 11.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 2.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 4.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 38.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "piiranha",
+   "label": "Piiranha v1 (mDeBERTa)",
+   "repo": "iiiorg/piiranha-v1-detect-personal-information",
+   "revision": "255acde67a2f34cf452eb42e365b24d2957352fc",
+   "precision": "fp32",
+   "licence": "CC-BY-NC-ND-4.0 (non-commercial, no derivatives)",
+   "licence_consequence": "OK for her own projects, used unmodified; can't be bundled (optional download she enables)",
+   "names_caught_pct": 34.9,
+   "names_caught_ci": [
+    32,
+    38
+   ],
+   "asian_caught_pct": 82.7,
+   "wrongly_hidden_pct": 1.0,
+   "wrongly_hidden_ci": [
+    1,
+    2
+   ],
+   "shops_hidden_pct": 48.0,
+   "vs_baseline_names": "-10.1 pts (p<0.001)",
+   "vs_baseline_hidden": "+0.1 pts (noise)",
+   "ms_median": 180,
+   "ms_p95": 239,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 773,
+   "per_category": {
+    "english": {
+     "caught": 5.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 99.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 58.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 91.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 26.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 17.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 0.0,
+     "hidden": 0.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 5.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 3.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 1.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 48.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "gliner_knowledgator",
+   "label": "GLiNER PII base (knowledgator)",
+   "repo": "knowledgator/gliner-pii-base-v1.0",
+   "revision": "61726e0ad791dcab3e29339bbec3ad42ded65641",
+   "precision": "fp32",
+   "licence": "Apache-2.0",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 80.9,
+   "names_caught_ci": [
+    78,
+    83
+   ],
+   "asian_caught_pct": 93.6,
+   "wrongly_hidden_pct": 22.0,
+   "wrongly_hidden_ci": [
+    20,
+    24
+   ],
+   "shops_hidden_pct": 100.0,
+   "vs_baseline_names": "+35.9 pts (p<0.001)",
+   "vs_baseline_hidden": "+21.1 pts (p<0.001)",
+   "ms_median": 121,
+   "ms_p95": 173,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 1669,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 93.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 88.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 82.0,
+     "hidden": 3.0
+    },
+    "split_lines": {
+     "caught": 91.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 51.0,
+     "hidden": 1.0
+    },
+    "glued": {
+     "caught": 47.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 72.0,
+     "hidden": 10.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 70.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 65.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 25.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 100.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "gliner_multi_pii",
+   "label": "GLiNER multi PII v1 (urchade)",
+   "repo": "urchade/gliner_multi_pii-v1",
+   "revision": "1fcf13e85f4eef5394e1fcd406cf2ca9ea82351d",
+   "precision": "fp32",
+   "licence": "Apache-2.0",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 80.5,
+   "names_caught_ci": [
+    78,
+    83
+   ],
+   "asian_caught_pct": 100.0,
+   "wrongly_hidden_pct": 1.8,
+   "wrongly_hidden_ci": [
+    1,
+    3
+   ],
+   "shops_hidden_pct": 22.0,
+   "vs_baseline_names": "+35.5 pts (p<0.001)",
+   "vs_baseline_hidden": "+0.9 pts (noise)",
+   "ms_median": 196,
+   "ms_p95": 259,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 2029,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 75.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 92.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 42.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 39.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 74.0,
+     "hidden": 4.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 0.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 2.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 2.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 22.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "gliner_multi_v21",
+   "label": "GLiNER multi v2.1 (urchade)",
+   "repo": "urchade/gliner_multi-v2.1",
+   "revision": "443d26d654e0324125a96bebd8e796c14ff2efe6",
+   "precision": "fp32",
+   "licence": "Apache-2.0",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 78.7,
+   "names_caught_ci": [
+    76,
+    81
+   ],
+   "asian_caught_pct": 98.5,
+   "wrongly_hidden_pct": 1.2,
+   "wrongly_hidden_ci": [
+    1,
+    2
+   ],
+   "shops_hidden_pct": 21.0,
+   "vs_baseline_names": "+33.7 pts (p<0.001)",
+   "vs_baseline_hidden": "+0.3 pts (noise)",
+   "ms_median": 196,
+   "ms_p95": 251,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 1594,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 95.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 68.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 92.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 36.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 39.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 75.0,
+     "hidden": 2.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 5.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 1.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 1.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 21.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "gliner_nvidia",
+   "label": "GLiNER-PII (NVIDIA)",
+   "repo": "nvidia/gliner-PII",
+   "revision": "bd23e8ef4425fd04e34c5204ab49ffaa706eae79",
+   "precision": "fp32",
+   "licence": "NVIDIA Open Model License",
+   "licence_consequence": "OK for her projects; bundling needs the licence text and NVIDIA's notice",
+   "names_caught_pct": 85.4,
+   "names_caught_ci": [
+    83,
+    88
+   ],
+   "asian_caught_pct": 90.3,
+   "wrongly_hidden_pct": 9.3,
+   "wrongly_hidden_ci": [
+    8,
+    11
+   ],
+   "shops_hidden_pct": 49.0,
+   "vs_baseline_names": "+40.4 pts (p<0.001)",
+   "vs_baseline_hidden": "+8.4 pts (p<0.001)",
+   "ms_median": 753,
+   "ms_p95": 1327,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 2944,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 96.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 75.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 87.0,
+     "hidden": 5.0
+    },
+    "split_lines": {
+     "caught": 95.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 58.0,
+     "hidden": 3.0
+    },
+    "glued": {
+     "caught": 70.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 89.0,
+     "hidden": 8.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 29.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 19.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 7.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 49.0
+    }
+   },
+   "is_baseline": false
+  },
+  {
+   "model": "gliner_multi_pii+current_ner",
+   "label": "GLiNER multi PII v1 + current model together",
+   "repo": "",
+   "revision": "",
+   "precision": "int8",
+   "licence": "Apache-2.0 + MIT",
+   "licence_consequence": "OK for her projects; can be bundled",
+   "names_caught_pct": 80.8,
+   "names_caught_ci": [
+    78,
+    83
+   ],
+   "asian_caught_pct": 100.0,
+   "wrongly_hidden_pct": 2.5,
+   "wrongly_hidden_ci": [
+    2,
+    4
+   ],
+   "shops_hidden_pct": 37.0,
+   "vs_baseline_names": "+35.8 pts (p<0.001)",
+   "vs_baseline_hidden": "+1.6 pts (p<0.001)",
+   "ms_median": 214,
+   "ms_p95": 281,
+   "ram_peak_mb": null,
+   "ram_after_load_mb": 2259,
+   "per_category": {
+    "english": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "malay": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "chinese": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "indian": {
+     "caught": 100.0,
+     "hidden": null
+    },
+    "allcaps": {
+     "caught": 75.0,
+     "hidden": 0.0
+    },
+    "split_lines": {
+     "caught": 95.0,
+     "hidden": null
+    },
+    "cut_off": {
+     "caught": 42.0,
+     "hidden": 0.0
+    },
+    "glued": {
+     "caught": 39.0,
+     "hidden": null
+    },
+    "statement_rows": {
+     "caught": 74.0,
+     "hidden": 5.0
+    },
+    "organisations": {
+     "caught": null,
+     "hidden": 4.0
+    },
+    "places": {
+     "caught": null,
+     "hidden": 5.0
+    },
+    "facts_survive": {
+     "caught": null,
+     "hidden": 3.0
+    },
+    "shops_named_after_people": {
+     "caught": null,
+     "hidden": 37.0
+    }
+   },
+   "is_baseline": false
+  }
+ ],
+ "report": "2026-11-22-bakeoff.md",
+ "headline_model": "gliner_multi_pii"
+}
