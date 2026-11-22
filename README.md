@@ -12,8 +12,10 @@ tacitkit is a small, dependency-free Python library that several apps can share:
 - **patterns** and **fold**: value-free hard detectors (keys, cards, ID numbers, passports,
   accounts) in country packs, Malaysian first ([ADR 0002](docs/adr/0002-patterns-and-fold.md)).
 
-Coming next: the messy-text name matcher, tiers and policy helpers, and an interface for
-optional local name-finding models.
+- **printed**: one name matcher for messy printed text: split, cut off, glued, reordered,
+  initials and markers ([ADR 0003](docs/adr/0003-printed-matcher.md)).
+
+Coming next: tiers and policy helpers, and an interface for optional local name-finding models.
 
 ```python
 from tacitkit import terms
