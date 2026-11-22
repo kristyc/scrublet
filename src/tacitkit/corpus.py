@@ -22,6 +22,8 @@ import unicodedata
 from collections.abc import Callable, Iterable
 from typing import NamedTuple
 
+from tacitkit.fold import fold as folded
+
 Gate = Callable[[str], tuple[str, str]]
 
 
@@ -204,7 +206,7 @@ CASES = _cases()
 
 def fold(text: str) -> str:
     """Letters and digits only, case-folded, compatibility-normalised."""
-    return "".join(ch for ch in unicodedata.normalize("NFKC", text).casefold() if ch.isalnum())
+    return folded(unicodedata.normalize("NFKC", text))[0]
 
 
 def leaks(secret: str, payload: str) -> bool:
