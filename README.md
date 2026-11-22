@@ -8,8 +8,12 @@ tacitkit is a small, dependency-free Python library that several apps can share:
   never-send and always-OK lists, plus read-only name sources such as a cardholder field in
   an app's own config file. See [ADR 0001](docs/adr/0001-global-word-store.md).
 
-Coming next: pattern detectors (keys, cards, ID numbers), messy-text matching, a synthetic test
-corpus and benchmark, and an interface for optional local name-finding models.
+- **corpus**: a synthetic test corpus and a runner each app calls with its own gate.
+- **patterns** and **fold**: value-free hard detectors (keys, cards, ID numbers, passports,
+  accounts) in country packs, Malaysian first ([ADR 0002](docs/adr/0002-patterns-and-fold.md)).
+
+Coming next: the messy-text name matcher, tiers and policy helpers, and an interface for
+optional local name-finding models.
 
 ```python
 from tacitkit import terms
