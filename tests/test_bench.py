@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tacitkit.bench import adapters, cases, cli, report, results, stats, worker
+from scrublet_pii.bench import adapters, cases, cli, report, results, stats, worker
 
 CORPUS = cases.build()
 FACTS = (*cases.FACT_CATS, cases.AMBIGUOUS)

@@ -5,7 +5,7 @@ words) plus a loader that turns it into `detect(text) -> [(start, stop), ...]`. 
 weights live in this repo. Weights download to a cache folder the user chooses, at the pinned
 commit, and are removed after the run unless `--keep-models` is given. Third-party packages
 (torch, gliner, onnxruntime, presidio, spaCy) are optional extras imported only by the
-adapter that needs them, so `import tacitkit.bench` stays dependency-free.
+adapter that needs them, so `import scrublet_pii.bench` stays dependency-free.
 
 Built-ins `oracle` and `null` need nothing and exist for tests and for smoke-checking the
 harness (a perfect finder and one that finds nothing).
@@ -22,8 +22,8 @@ Detect = Callable[[str], list[tuple[int, int]]]
 
 OK_OWN = "OK for personal and company use; can be bundled"
 NON_COMMERCIAL = (
-    "OK for her own, non-commercial projects; can't be bundled in a public library "
-    "(it would be an optional download the user enables)"
+    "OK for your own non-commercial projects; can't be bundled in a public library "
+    "(it would be an optional download you enable)"
 )
 
 
@@ -46,7 +46,7 @@ class Spec:
 
 
 GLINER_PII, GLINER_REV = "urchade/gliner_multi_pii-v1", "1fcf13e85f4eef5394e1fcd406cf2ca9ea82351d"
-ONNX_DIR = "gliner_multi_pii-onnx"  # inside the cache, made by `tacitkit.bench export-gliner`
+ONNX_DIR = "gliner_multi_pii-onnx"  # inside the cache, made by `scrublet_pii.bench export-gliner`
 
 
 def _tagger(name, label, repo, revision, labels, licence, consequence, languages, mb, files):
@@ -170,7 +170,7 @@ SPECS: dict[str, Spec] = {
             "gliner",
             "fp32",
             "NVIDIA Open Model License",
-            "OK for her own use; bundling needs the licence text and NVIDIA's notice, and the licence "
+            "OK for your own use; bundling needs the licence text and NVIDIA's notice, and the licence "
             "ends if its safety guardrails are bypassed",
             "English",
             "nvidia/gliner-PII",
@@ -464,7 +464,7 @@ def _gliner_onnx(spec, cache, threads, truth):
     folder = cache / ONNX_DIR
     if not (folder / spec.options["onnx_file"]).is_file():
         raise SystemExit(
-            f"{spec.name}: run `python -m tacitkit.bench export-gliner --cache {cache}` first"
+            f"{spec.name}: run `python -m scrublet_pii.bench export-gliner --cache {cache}` first"
         )
     model = GLiNER.from_pretrained(
         str(folder),
@@ -477,12 +477,12 @@ def _gliner_onnx(spec, cache, threads, truth):
 
 
 def _gliner_lean(spec, cache, threads, truth):
-    from tacitkit.models.gliner_onnx import GlinerOnnx  # noqa: PLC0415
+    from scrublet_pii.models.gliner_onnx import GlinerOnnx  # noqa: PLC0415
 
     folder = cache / ONNX_DIR
     if not (folder / spec.options["onnx_file"]).is_file():
         raise SystemExit(
-            f"{spec.name}: run `python -m tacitkit.bench export-gliner --cache {cache}` first"
+            f"{spec.name}: run `python -m scrublet_pii.bench export-gliner --cache {cache}` first"
         )
     model = GlinerOnnx(
         folder,

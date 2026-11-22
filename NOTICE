@@ -1,0 +1,9 @@
+scrublet-pii
+Copyright 2026 The scrublet-pii authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It contains no model weights and no third-party code. The optional bench downloads public
+models on request into a folder you choose; each keeps its own licence (see
+`python -m scrublet_pii.bench models` and the README). Models under non-commercial terms
+are never bundled with or redistributed by this package.

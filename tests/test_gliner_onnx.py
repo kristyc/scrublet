@@ -1,5 +1,5 @@
 """The lean GLiNER runner: its text handling is tested without a model; with the ONNX files in
-TACITKIT_GLINER_ONNX_DIR (the folder `export-gliner` makes) it is also run for real. The proof
+SCRUBLET_GLINER_ONNX_DIR (the folder `export-gliner` makes) it is also run for real. The proof
 that it matches the gliner package on all 1,430 corpus cases is a stored bench run
 (bench/results/2026-11-22-lean-parity.md)."""
 
@@ -12,10 +12,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from tacitkit.models import gliner_onnx
-from tacitkit.models.gliner_onnx import MAX_TOKENS, OVERLAP, GlinerOnnx
+from scrublet_pii.models import gliner_onnx
+from scrublet_pii.models.gliner_onnx import MAX_TOKENS, OVERLAP, GlinerOnnx
 
-FOLDER = os.environ.get("TACITKIT_GLINER_ONNX_DIR", "")
+FOLDER = os.environ.get("SCRUBLET_GLINER_ONNX_DIR", "")
 
 
 class Pieces:
@@ -38,7 +38,7 @@ def runner(size=1):
 
 def test_importing_the_runner_loads_no_heavy_package():
     code = (
-        "import sys; import tacitkit.models.gliner_onnx; "
+        "import sys; import scrublet_pii.models.gliner_onnx; "
         "heavy = ('torch', 'transformers', 'gliner', 'numpy', 'onnxruntime'); "
         "print(sorted(m for m in heavy if m in sys.modules))"
     )
@@ -86,7 +86,7 @@ def test_spans_from_overlapping_windows_merge_into_one():
 
 
 @pytest.mark.skipif(
-    not FOLDER, reason="TACITKIT_GLINER_ONNX_DIR not set (needs the exported ONNX files)"
+    not FOLDER, reason="SCRUBLET_GLINER_ONNX_DIR not set (needs the exported ONNX files)"
 )
 def test_with_the_real_model_it_finds_names_in_four_scripts_and_nothing_in_plain_text():
     model = GlinerOnnx(FOLDER)

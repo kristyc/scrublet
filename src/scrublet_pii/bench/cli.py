@@ -1,9 +1,9 @@
-"""python -m tacitkit.bench: bakeoff, export-gliner, models, results.
+"""python -m scrublet_pii.bench: bakeoff, export-gliner, models, results.
 
-    python -m tacitkit.bench models
-    python -m tacitkit.bench bakeoff --models current_ner,gliner_multi_pii --cache D:/models --rule slim
-    python -m tacitkit.bench export-gliner --cache D:/models
-    python -m tacitkit.bench results
+    python -m scrublet_pii.bench models
+    python -m scrublet_pii.bench bakeoff --models current_ner,gliner_multi_pii --cache D:/models --rule slim
+    python -m scrublet_pii.bench export-gliner --cache D:/models
+    python -m scrublet_pii.bench results
 
 Weights download to --cache at pinned commits and are removed afterwards unless --keep-models.
 Only what this run added is removed, by absolute path, and never the cache folder itself if it
@@ -24,7 +24,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from tacitkit.bench import adapters, cases, report, results, stats
+from scrublet_pii.bench import adapters, cases, report, results, stats
 
 RULES = {
     # Replace the baseline: a clear gain, nothing lost, usable speed and memory.
@@ -121,7 +121,7 @@ def run_worker(model: str, cases_file: Path, out: Path, cache: Path, threads: in
         [
             sys.executable,
             "-m",
-            "tacitkit.bench.worker",
+            "scrublet_pii.bench.worker",
             model,
             str(cases_file),
             str(out),
@@ -156,7 +156,7 @@ def bakeoff(args) -> int:
     names = [m.strip() for m in args.models.split(",") if m.strip()]
     unknown = [m for m in names if m not in adapters.SPECS]
     if unknown:
-        raise SystemExit(f"unknown model(s) {unknown}; run `python -m tacitkit.bench models`")
+        raise SystemExit(f"unknown model(s) {unknown}; run `python -m scrublet_pii.bench models`")
     baseline = args.baseline
     if baseline and baseline not in names:
         names.insert(0, baseline)
@@ -183,7 +183,7 @@ def bakeoff(args) -> int:
         "seed": cases.SEED,
     }
     scored, failed, ran = {}, {}, []
-    work = Path(tempfile.mkdtemp(prefix="tacitkit-bench-"))
+    work = Path(tempfile.mkdtemp(prefix="scrublet-bench-"))
     try:
         cases_file = work / "cases.json"
         cases_file.write_text(json.dumps(corpus, ensure_ascii=False), encoding="utf-8")
@@ -285,7 +285,7 @@ def show_results(args) -> int:
 
 def parser() -> argparse.ArgumentParser:
     top = argparse.ArgumentParser(
-        prog="python -m tacitkit.bench", description=__doc__.split("\n\n")[0]
+        prog="python -m scrublet_pii.bench", description=__doc__.split("\n\n")[0]
     )
     sub = top.add_subparsers(dest="command", required=True)
     run = sub.add_parser("bakeoff", help="run the corpus over models and write the report")

@@ -14,6 +14,7 @@ and reversed orders. An initial is a capital with no letter after it, at least o
 3+ letters stays whole, and markers are left out of these forms. Values in `whole` (a linked
 list's phrases) get none of this: they match as the whole phrase only.
 """
+
 from __future__ import annotations
 
 import math
@@ -22,15 +23,18 @@ from collections.abc import Iterable
 from functools import lru_cache
 from itertools import permutations
 
-from tacitkit.fold import fold
+from scrublet_pii.fold import fold
 
 # Printed forms of one marker family are interchangeable: BINTI is often BT.
-FAMILIES = (frozenset({"bin", "binti", "bt", "bte"}), frozenset({"ap", "al"}),
-            frozenset({"so", "do"}))
+FAMILIES = (
+    frozenset({"bin", "binti", "bt", "bte"}),
+    frozenset({"ap", "al"}),
+    frozenset({"so", "do"}),
+)
 MARKERS = frozenset().union(*FAMILIES)
 SLASHED = re.compile(r"\b([asd])\s*/\s*([plo])\b", re.IGNORECASE)
 WORD = re.compile(r"[^\W_]+")
-GLUED = 8   # a whole value this long matches with no word edge
+GLUED = 8  # a whole value this long matches with no word edge
 
 
 @lru_cache(maxsize=8192)
@@ -45,7 +49,7 @@ def variants(value: str) -> tuple[tuple[str, str, int], ...]:
     shortest = len(folded) if len(folded) < 8 else max(6, math.ceil(0.6 * len(folded)))
     found = [("text", folded, shortest)]
     words = [fold(word)[0] for word in WORD.findall(SLASHED.sub(r"\1\2", value))]
-    if len(words) > 1 and not digits:   # names, not addresses: 'Jalan' alone is common
+    if len(words) > 1 and not digits:  # names, not addresses: 'Jalan' alone is common
         for position, word in enumerate(words):
             if word in MARKERS:
                 continue
@@ -58,7 +62,7 @@ def variants(value: str) -> tuple[tuple[str, str, int], ...]:
     return tuple(dict.fromkeys(found))
 
 
-ALL_ORDERS_UP_TO = 4   # past this many words, as listed and reversed only
+ALL_ORDERS_UP_TO = 4  # past this many words, as listed and reversed only
 
 
 def _words(value: str) -> list[str]:
@@ -80,8 +84,11 @@ def forms(value: str) -> tuple[tuple[str, tuple[int, ...]], ...]:
     if len(words) < 2:
         return ()
     listed = tuple(words)
-    orders = (list(dict.fromkeys(permutations(words))) if len(words) <= ALL_ORDERS_UP_TO
-              else [listed, listed[::-1]])
+    orders = (
+        list(dict.fromkeys(permutations(words)))
+        if len(words) <= ALL_ORDERS_UP_TO
+        else [listed, listed[::-1]]
+    )
     found = [("".join(order), ()) for order in orders if order != listed]
     for order in dict.fromkeys((listed, listed[::-1])):
         for mask in range(1, 2 ** len(order) - 1):
@@ -99,14 +106,19 @@ def forms(value: str) -> tuple[tuple[str, tuple[int, ...]], ...]:
 def _formed(text: str, folded: str, index: list[int], value: str) -> list[tuple[int, int, str]]:
     found = []
     if not any(word in folded for word in _gate(value)):
-        return found   # cheap gate: no whole word of the name is here
+        return found  # cheap gate: no whole word of the name is here
     for needle, initials in forms(value):
         at = folded.find(needle)
         while at >= 0:
             start, stop = index[at], index[at + len(needle) - 1] + 1
-            if (not _letter(text, start - 1) and not _letter(text, stop) and all(
+            if (
+                not _letter(text, start - 1)
+                and not _letter(text, stop)
+                and all(
                     text[index[at + k]].isupper() and not _letter(text, index[at + k] + 1)
-                    for k in initials)):
+                    for k in initials
+                )
+            ):
                 found.append((start, stop, value))
             at = folded.find(needle, at + 1)
     return found
@@ -116,8 +128,9 @@ def _letter(text: str, position: int) -> bool:
     return 0 <= position < len(text) and text[position].isalpha()
 
 
-def matches(text: str, values: Iterable[str],
-            whole: frozenset[str] = frozenset()) -> list[tuple[int, int, str]]:
+def matches(
+    text: str, values: Iterable[str], whole: frozenset[str] = frozenset()
+) -> list[tuple[int, int, str]]:
     """Every (start, stop, value) where a known value appears as printed. Values in `whole`
     (a linked list's phrases and holder names) match as the whole phrase only, never one
     word of it alone: a company phrase must not hide every "Malaysian" or "Trading"."""
@@ -132,19 +145,22 @@ def matches(text: str, values: Iterable[str],
                 at = digits.find(needle)
                 while at >= 0:
                     start, stop = digit_index[at], digit_index[at + len(needle) - 1] + 1
-                    if stop - start <= 3 * len(needle) + 10:   # one printed number, not a page
+                    if stop - start <= 3 * len(needle) + 10:  # one printed number, not a page
                         found.append((start, stop, value))
                     at = digits.find(needle, at + 1)
                 continue
             at = folded.find(needle[:shortest])
             while at >= 0:
                 length = shortest
-                while (length < len(needle) and at + length < len(folded)
-                       and folded[at + length] == needle[length]):
+                while (
+                    length < len(needle)
+                    and at + length < len(folded)
+                    and folded[at + length] == needle[length]
+                ):
                     length += 1
                 start, stop = index[at], index[at + length - 1] + 1
                 # A whole value of 8+ letters and digits matches glued into the words around
-                # it ("PAYMENTTOTAN AH KOW", "TAN AH KOWMAYBANK"; review #12), as statement
+                # it ("PAYMENTTOTAN AH KOW", "TAN AH KOWMAYBANK"), as statement
                 # text prints them. Shorter or partial ones keep the letter-edge rule, so a short
                 # name never matches inside another word.
                 glued = length == len(needle) >= GLUED and needle == full

@@ -1,5 +1,6 @@
 """Messy-text folding: letters and digits only, case-folded, with an index map back to the
 original text, so a name split across lines or spaced oddly is found where it was printed."""
+
 from __future__ import annotations
 
 

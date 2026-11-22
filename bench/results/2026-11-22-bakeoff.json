@@ -23,7 +23,7 @@
  },
  "winner": null,
  "decision": "pick GLiNER multi PII v1 for quality; switch waits on a slim form (no model passed the memory rule)",
- "source": "reconstructed from the published report tables (remy docs/privacy-model-bakeoff.md); the run predates this module and per-case data was not kept; ram_after_load_mb is memory after loading, not peak; speed columns for challengers are fp32 torch against the baseline's int8 ONNX (not like-for-like)",
+ "source": "reconstructed from the published tables of the first bake-off report; the run predates this module and per-case data was not kept; ram_after_load_mb is memory after loading, not peak; speed columns for challengers are fp32 torch against the baseline's int8 ONNX (not like-for-like)",
  "models": [
   {
    "model": "current_ner",
@@ -32,7 +32,7 @@
    "revision": "8e892123e8b7c2c0c2bd1dcb598b7d244c4e53aa",
    "precision": "int8",
    "licence": "MIT",
-   "licence_consequence": "OK for her projects; bundled today",
+   "licence_consequence": "OK for personal and company use; can be bundled (the baseline)",
    "names_caught_pct": 45.0,
    "names_caught_ci": [
     42,
@@ -196,7 +196,7 @@
    "revision": "",
    "precision": "fp32",
    "licence": "MIT (Presidio, spaCy model)",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 60.3,
    "names_caught_ci": [
     57,
@@ -278,7 +278,7 @@
    "revision": "253f557bd8249b8515114cfd7f71974fe5fa4d2f",
    "precision": "fp32",
    "licence": "AFL-3.0 (permissive)",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 53.5,
    "names_caught_ci": [
     50,
@@ -360,7 +360,7 @@
    "revision": "68089cd67db0b937a48ef97b62673cfdde67cb83",
    "precision": "fp32",
    "licence": "MIT (training data not stated)",
-   "licence_consequence": "OK for her projects; bundling OK by its licence, data source unknown",
+   "licence_consequence": "OK for personal and company use; the licence allows bundling but the data source is unknown",
    "names_caught_pct": 67.2,
    "names_caught_ci": [
     64,
@@ -442,7 +442,7 @@
    "revision": "9814d1113e03f72e8d383423188a51b43d5534c9",
    "precision": "fp32",
    "licence": "CC-BY-NC-4.0 (non-commercial)",
-   "licence_consequence": "OK for her own projects; can't be bundled in the public library (optional download she enables)",
+   "licence_consequence": "OK for your own non-commercial use; can't be bundled in a public library (an optional download you enable)",
    "names_caught_pct": 58.2,
    "names_caught_ci": [
     55,
@@ -524,7 +524,7 @@
    "revision": "255acde67a2f34cf452eb42e365b24d2957352fc",
    "precision": "fp32",
    "licence": "CC-BY-NC-ND-4.0 (non-commercial, no derivatives)",
-   "licence_consequence": "OK for her own projects, used unmodified; can't be bundled (optional download she enables)",
+   "licence_consequence": "OK for your own non-commercial use, unmodified; can't be bundled (an optional download you enable)",
    "names_caught_pct": 34.9,
    "names_caught_ci": [
     32,
@@ -606,7 +606,7 @@
    "revision": "61726e0ad791dcab3e29339bbec3ad42ded65641",
    "precision": "fp32",
    "licence": "Apache-2.0",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 80.9,
    "names_caught_ci": [
     78,
@@ -688,7 +688,7 @@
    "revision": "1fcf13e85f4eef5394e1fcd406cf2ca9ea82351d",
    "precision": "fp32",
    "licence": "Apache-2.0",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 80.5,
    "names_caught_ci": [
     78,
@@ -770,7 +770,7 @@
    "revision": "443d26d654e0324125a96bebd8e796c14ff2efe6",
    "precision": "fp32",
    "licence": "Apache-2.0",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 78.7,
    "names_caught_ci": [
     76,
@@ -852,7 +852,7 @@
    "revision": "bd23e8ef4425fd04e34c5204ab49ffaa706eae79",
    "precision": "fp32",
    "licence": "NVIDIA Open Model License",
-   "licence_consequence": "OK for her projects; bundling needs the licence text and NVIDIA's notice",
+   "licence_consequence": "OK for your own use; bundling needs the licence text and NVIDIA's notice",
    "names_caught_pct": 85.4,
    "names_caught_ci": [
     83,
@@ -934,7 +934,7 @@
    "revision": "",
    "precision": "int8",
    "licence": "Apache-2.0 + MIT",
-   "licence_consequence": "OK for her projects; can be bundled",
+   "licence_consequence": "OK for personal and company use; can be bundled",
    "names_caught_pct": 80.8,
    "names_caught_ci": [
     78,

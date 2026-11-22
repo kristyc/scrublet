@@ -4,7 +4,7 @@ Status: accepted (22 Nov 2026)
 
 ## Decision
 
-`tacitkit.patterns` holds the hard detectors, and `tacitkit.fold` holds the folding with an
+`scrublet_pii.patterns` holds the hard detectors, and `scrublet_pii.fold` holds the folding with an
 index map. Both are moved byte for byte from the owner's assistant app's gate, which had the
 stronger card, IC, passport, account and key detection of the apps reviewed. Comments that cite
 that app's ADRs and review items keep those references for history.
@@ -14,7 +14,7 @@ that app's ADRs and review items keep those references for history.
   and town, the bank names, RM, and the passport letter shapes.
 - `name` is value-free (`pattern.card`). `group` is `identity`, `financial` or `credential`.
   Each app maps the group to its own categories, and the name to its own tier (hide, liftable or
-  hard). The tiers themselves move to `tacitkit.policy` later.
+  hard). The tiers themselves move to `scrublet_pii.policy` later.
 - `find()` returns `(start, stop, name)` and `kinds()` returns the names, never a value.
 - A finder is a compiled regex or a regex-like object (`search` and `finditer` yielding spans).
   Cards are found by network prefix plus Luhn, read across printed groups (spaces, non-breaking

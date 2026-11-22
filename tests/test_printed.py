@@ -1,7 +1,8 @@
 """The merged name matcher (ADR 0003). Synthetic names only."""
+
 import pytest
 
-from tacitkit import corpus, printed
+from scrublet_pii import corpus, printed
 
 NAME = "Tan Ah Kow"
 
@@ -10,26 +11,32 @@ def found(text, values=(NAME,), whole=frozenset()):
     return sorted({text[a:b] for a, b, _v in printed.matches(text, values, whole)})
 
 
-@pytest.mark.parametrize(("text", "hit"), [
-    ("TAN\nAH  KOW paid", "TAN\nAH  KOW"),          # split and spaced
-    ("PAYMENTTOTAN AH KOW", "TAN AH KOW"),          # glued, whole value of 8+
-    ("TAN AH K", "TAN AH K"),                       # cut at the field width
-    ("AH KOW TAN", "AH KOW TAN"),                   # reordered
-    ("KOW, TAN AH", "KOW, TAN AH"),
-    ("T. AH KOW", "T. AH KOW"),                     # an initial
-    ("KOW A T", "KOW A T"),                         # reversed with initials
-])
+@pytest.mark.parametrize(
+    ("text", "hit"),
+    [
+        ("TAN\nAH  KOW paid", "TAN\nAH  KOW"),  # split and spaced
+        ("PAYMENTTOTAN AH KOW", "TAN AH KOW"),  # glued, whole value of 8+
+        ("TAN AH K", "TAN AH K"),  # cut at the field width
+        ("AH KOW TAN", "AH KOW TAN"),  # reordered
+        ("KOW, TAN AH", "KOW, TAN AH"),
+        ("T. AH KOW", "T. AH KOW"),  # an initial
+        ("KOW A T", "KOW A T"),  # reversed with initials
+    ],
+)
 def test_a_name_is_found_as_statements_print_it(text, hit):
     assert hit in found(text)
 
 
-@pytest.mark.parametrize("text", [
-    "STANDUP AH KOWLOON",          # no word edge
-    "tahkow",                      # an initial must be a capital standing alone
-    "TAHKOW",
-    "Dr Tan said so",              # one short word of the name
-    "A K",                         # never every word an initial
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "STANDUP AH KOWLOON",  # no word edge
+        "tahkow",  # an initial must be a capital standing alone
+        "TAHKOW",
+        "Dr Tan said so",  # one short word of the name
+        "A K",  # never every word an initial
+    ],
+)
 def test_no_match_inside_words_or_on_initials_alone(text):
     assert found(text) == []
 
@@ -63,6 +70,7 @@ def test_long_names_use_listed_and_reversed_orders_only():
 
 def test_every_printed_and_never_send_corpus_text_is_found():
     values = (*corpus.NEVER_SEND, *corpus.LINKED)
-    texts = [text for text, secret in (*corpus.NEVER, *corpus.LINKED_TEXT, *corpus.PRINTED)
-             if secret]
+    texts = [
+        text for text, secret in (*corpus.NEVER, *corpus.LINKED_TEXT, *corpus.PRINTED) if secret
+    ]
     assert [text for text in texts if not printed.matches(text, values)] == []

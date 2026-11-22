@@ -1,6 +1,6 @@
 """One model over the corpus, alone in a fresh process, so its peak memory is its own.
 
-    python -m tacitkit.bench.worker <model> <cases.json> <out.json> --cache <folder> [--threads 2]
+    python -m scrublet_pii.bench.worker <model> <cases.json> <out.json> --cache <folder> [--threads 2]
 
 Runs at below-normal priority. Writes spans per case id, milliseconds per case (after a
 warm-up call), memory after loading and the peak working set of the whole run.
@@ -14,7 +14,7 @@ import sys
 import time
 from pathlib import Path
 
-from tacitkit.bench import adapters
+from scrublet_pii.bench import adapters
 
 
 def memory_mb() -> tuple[float, float]:
@@ -89,7 +89,7 @@ def run(model: str, cases: list[dict], cache: Path, threads: int) -> dict:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="tacitkit.bench.worker")
+    parser = argparse.ArgumentParser(prog="scrublet_pii.bench.worker")
     parser.add_argument("model")
     parser.add_argument("cases")
     parser.add_argument("out")

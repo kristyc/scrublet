@@ -11,7 +11,7 @@ export. Running it through the `gliner` package costs a torch install (about 1.2
 
 ## Decision
 
-`tacitkit.models.gliner_onnx.GlinerOnnx(folder, onnx_file)` runs the exported model with
+`scrublet_pii.models.gliner_onnx.GlinerOnnx(folder, onnx_file)` runs the exported model with
 onnxruntime, tokenizers and numpy only. It follows the gliner package's convention: words by
 `\w+(?:[-_]\w+)*|\S`; the prompt `<<ENT>> person <<SEP>>`; each word its own pre-token; the
 word mask on each word's first sub-token; all spans up to `max_width`; sigmoid of the logits

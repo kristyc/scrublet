@@ -9,7 +9,7 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import asdict, dataclass
 
-from tacitkit.bench import adapters, cases, stats
+from scrublet_pii.bench import adapters, cases, stats
 
 RULE_LABELS = {
     "names_gain": "names gain",

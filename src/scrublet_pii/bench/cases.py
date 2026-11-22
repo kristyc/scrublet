@@ -558,7 +558,7 @@ def places():
 
 
 def statement_rows():
-    """Ledger Flow-style rows (REMY-PRIVACY-REVIEW.md): transfers carry people, purchases merchants."""
+    """Bank-statement-style rows: transfers carry people, purchases carry merchants."""
     out = []
     for _ in range(N):
         date, amount = keep_date(), keep_amount()

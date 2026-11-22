@@ -4,7 +4,7 @@ Status: accepted (22 Nov 2026)
 
 ## Decision
 
-`tacitkit.printed.matches(text, values, whole)` finds known values as documents print them.
+`scrublet_pii.printed.matches(text, values, whole)` finds known values as documents print them.
 
 - **The first app's matcher is the base, unchanged:**
   - folded matching that ignores case, punctuation, spacing and line breaks;

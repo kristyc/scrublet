@@ -2,7 +2,7 @@
 
 No real person, account or number: card numbers are public test values, the names and
 places are invented or public. The first pack is Malaysian (country packs follow
-tacitkit.patterns). Each app gives the runner one function per path it has:
+scrublet_pii.patterns). Each app gives the runner one function per path it has:
 
     def search(text) -> (outcome, payload)    # a web search query
     def message(text) -> (outcome, payload)   # the owner's own text going to a model
@@ -15,6 +15,7 @@ list (or its own list, if it has no linked tier) before running.
 run() returns every miss. A case the app knowingly misses goes in `known` with a reason in
 the app's test, so the list is visible and shrinks: a known case that passes is reported too.
 """
+
 from __future__ import annotations
 
 import re
@@ -22,19 +23,19 @@ import unicodedata
 from collections.abc import Callable, Iterable
 from typing import NamedTuple
 
-from tacitkit.fold import fold as folded
+from scrublet_pii.fold import fold as folded
 
 Gate = Callable[[str], tuple[str, str]]
 
 
 class Case(NamedTuple):
     id: str
-    path: str                   # "search", "message" or "document"
+    path: str  # "search", "message" or "document"
     text: str
-    expect: str                 # a key of EXPECT
-    secret: tuple[str, ...] = ()   # must not be in the payload (folded)
-    keep: tuple[str, ...] = ()     # must be in the payload, as written
-    kind: str = ""              # value-free category, for reports
+    expect: str  # a key of EXPECT
+    secret: tuple[str, ...] = ()  # must not be in the payload (folded)
+    keep: tuple[str, ...] = ()  # must be in the payload, as written
+    kind: str = ""  # value-free category, for reports
 
 
 EXPECT = {
@@ -47,10 +48,10 @@ EXPECT = {
 
 # Web searches as typed: must reach the provider byte-identical.
 SEARCHES = (
-    "Lazada order 312345678901234 delivery status",     # long numbers that are no card
+    "Lazada order 312345678901234 delivery status",  # long numbers that are no card
     "J&T tracking 6300123456789",
     "PosLaju tracking EN1234567890123MY",
-    "track J&T parcel 630012345678",                     # digits that are no account or IC
+    "track J&T parcel 630012345678",  # digits that are no account or IC
     "Shopee order 2411220ABCD123 status",
     "Maybank hotline 1300 88 6688",
     "opening hours of the National Library of Malaysia",
@@ -87,8 +88,8 @@ SEARCHES = (
     "TNB bill payment due date",
     "Unifi fibre outage Cheras today",
     "weather forecast Genting Highlands this weekend",
-    "Lazada order 261122123456 status",                 # 12 digits starting with a date: no IC
-    "Watsons receipt K12345678 refund",                 # a letter + 8 digits: no passport
+    "Lazada order 261122123456 status",  # 12 digits starting with a date: no IC
+    "Watsons receipt K12345678 refund",  # a letter + 8 digits: no passport
     "Star Alliance member 1234567890 lounge access",
     "my amazon account order 123-4567890-1234567 not delivered",
 )
@@ -97,7 +98,7 @@ SEARCHES = (
 MESSAGES = (
     "My Shopee order 241122012345678 hasn't arrived",
     "Booking ref 7012345678901234 for the hotel",
-    "Call the clinic back on 012-345 6789 tomorrow",    # a phone: hidden, never refused
+    "Call the clinic back on 012-345 6789 tomorrow",  # a phone: hidden, never refused
     "Where is my Lazada order 2411220ABCD123?",
     "Remind me to call Aisyah about the Q3 slides tomorrow at 10am",
     "Draft a thank-you note to Wei Ling for covering the client call",
@@ -123,8 +124,11 @@ MESSAGES = (
 # Hard items: never sent on any path. id -> (text, kind, secret). Messy layouts on purpose.
 HARD = {
     "password": ("My password is Kopi-Ais#2026 for the portal", "password", "Kopi-Ais#2026"),
-    "api_key": ("Use this key sk-ant-api03-SYNTHETICabcdefghijklmnopqrstuvwxyz0123456789",
-                "api_key", "SYNTHETICabcdefghijklmnopqrstuvwxyz0123456789"),
+    "api_key": (
+        "Use this key sk-ant-api03-SYNTHETICabcdefghijklmnopqrstuvwxyz0123456789",
+        "api_key",
+        "SYNTHETICabcdefghijklmnopqrstuvwxyz0123456789",
+    ),
     "otp": ("The OTP is 482913, enter it now", "otp", "482913"),
     "ic": ("My IC is 900101-14-5678", "ic", "900101145678"),
     "ic_spaced": ("IC no 900101 14 5678", "ic", "900101145678"),
@@ -142,8 +146,7 @@ HARD = {
     "card_mastercard_mixed": ("5555 5555-5555 4444", "card", "5555555555554444"),
     "bank_account": ("Transfer to account 5140 1234 5678 at Maybank", "account", "514012345678"),
     "account_label_above": ("Account No.\n5140 1234 5678", "account", "514012345678"),
-    "account_cell_padded": ("ACCOUNT NUMBER     :     5140-1234-5678", "account",
-                            "514012345678"),
+    "account_cell_padded": ("ACCOUNT NUMBER     :     5140-1234-5678", "account", "514012345678"),
 }
 
 # The owner's never-send list for the corpus, and linked names (another app's list).
@@ -154,22 +157,22 @@ LINKED = ("Tan Ah Kow", "Kedai Runcit Bunga")
 NEVER = (
     ("Melati Cafe opening hours", "Melati Cafe"),
     ("Book Melati Cafe for Friday", "Melati Cafe"),
-    ("SITI AMINAH BT ABU", "SITI AMINAH"),               # marker family (binti, bt)
-    ("KUMAR A / P RAJ", "KUMAR"),                         # spaced marker
+    ("SITI AMINAH BT ABU", "SITI AMINAH"),  # marker family (binti, bt)
+    ("KUMAR A / P RAJ", "KUMAR"),  # spaced marker
 )
 LINKED_TEXT = (
     ("TAN AH KOW birthday gift ideas", "TAN AH KOW"),
     ("Draft a note to Kedai Runcit Bunga", "Kedai Runcit Bunga"),
-    ("PAYMENTTOTAN AH KOW", "TAN AH KOW"),                # glued at the start
-    ("TAN AH KOWMAYBANK 5140", "TAN AH KOW"),             # glued at the end
+    ("PAYMENTTOTAN AH KOW", "TAN AH KOW"),  # glued at the start
+    ("TAN AH KOWMAYBANK 5140", "TAN AH KOW"),  # glued at the end
 )
 # How statements print a listed name: never sent on any path. (text, secret)
 PRINTED = (
-    ("DUITNOW TRF TAN AH KOW 12.34", "TAN AH KOW"),      # a transfer row is not a merchant
-    ("AH KOW TAN", "AH KOW TAN"),                         # reordered
-    ("T. AH KOW", "AH KOW"),                              # an initial
-    ("TAN AH K", "TAN AH K"),                             # cut at the field width
-    ("PAYMENT THANK YOU CR ACME BANK A/P", ""),           # the marker alone, name cut off
+    ("DUITNOW TRF TAN AH KOW 12.34", "TAN AH KOW"),  # a transfer row is not a merchant
+    ("AH KOW TAN", "AH KOW TAN"),  # reordered
+    ("T. AH KOW", "AH KOW"),  # an initial
+    ("TAN AH K", "TAN AH K"),  # cut at the field width
+    ("PAYMENT THANK YOU CR ACME BANK A/P", ""),  # the marker alone, name cut off
 )
 # Document lines whose facts must survive. (text, kept)
 DOCUMENTS = (
@@ -180,24 +183,41 @@ DOCUMENTS = (
 
 
 def _cases() -> tuple[Case, ...]:
-    cases = [Case(f"search.everyday.{n}", "search", text, "sent", kind="everyday")
-             for n, text in enumerate(SEARCHES)]
-    cases += [Case(f"message.everyday.{n}", "message", text, "not_refused", kind="everyday")
-              for n, text in enumerate(MESSAGES)]
+    cases = [
+        Case(f"search.everyday.{n}", "search", text, "sent", kind="everyday")
+        for n, text in enumerate(SEARCHES)
+    ]
+    cases += [
+        Case(f"message.everyday.{n}", "message", text, "not_refused", kind="everyday")
+        for n, text in enumerate(MESSAGES)
+    ]
     for name, (text, kind, secret) in HARD.items():
-        cases += [Case(f"{path}.hard.{name}", path, text, "withheld", (secret,), kind=kind)
-                  for path in ("search", "message")]
+        cases += [
+            Case(f"{path}.hard.{name}", path, text, "withheld", (secret,), kind=kind)
+            for path in ("search", "message")
+        ]
     for group, items, hidden in (("never", NEVER, "withheld"), ("linked", LINKED_TEXT, "hidden")):
         for n, (text, secret) in enumerate(items):
-            cases += [Case(f"search.{group}.{n}", "search", text, "refused", kind=group),
-                      Case(f"message.{group}.{n}", "message", text, hidden, (secret,),
-                           kind=group)]
+            cases += [
+                Case(f"search.{group}.{n}", "search", text, "refused", kind=group),
+                Case(f"message.{group}.{n}", "message", text, hidden, (secret,), kind=group),
+            ]
     for n, (text, secret) in enumerate(PRINTED):
-        cases += [Case(f"{path}.printed.{n}", path, text, "withheld",
-                       (secret,) if secret else (), kind="printed")
-                  for path in ("search", "document")]
-    cases += [Case(f"document.facts.{n}", "document", text, "not_refused", keep=kept,
-                   kind="facts") for n, (text, kept) in enumerate(DOCUMENTS)]
+        cases += [
+            Case(
+                f"{path}.printed.{n}",
+                path,
+                text,
+                "withheld",
+                (secret,) if secret else (),
+                kind="printed",
+            )
+            for path in ("search", "document")
+        ]
+    cases += [
+        Case(f"document.facts.{n}", "document", text, "not_refused", keep=kept, kind="facts")
+        for n, (text, kept) in enumerate(DOCUMENTS)
+    ]
     return tuple(cases)
 
 
@@ -225,15 +245,15 @@ def leaks(secret: str, payload: str) -> bool:
 class Miss(NamedTuple):
     id: str
     kind: str
-    problem: str   # "outcome:<outcome>", "leaked" or "lost a fact"; never the payload
+    problem: str  # "outcome:<outcome>", "leaked" or "lost a fact"; never the payload
 
 
 class Report(NamedTuple):
-    misses: tuple[Miss, ...]        # new misses: the app's test fails on these
-    known: tuple[str, ...]          # known misses that still miss
-    fixed: tuple[str, ...]          # known misses that now pass: drop them from `known`
-    skipped: tuple[str, ...]        # cases for a path the app didn't give
-    counts: dict                    # {(path, kind): {outcome: n}}
+    misses: tuple[Miss, ...]  # new misses: the app's test fails on these
+    known: tuple[str, ...]  # known misses that still miss
+    fixed: tuple[str, ...]  # known misses that now pass: drop them from `known`
+    skipped: tuple[str, ...]  # cases for a path the app didn't give
+    counts: dict  # {(path, kind): {outcome: n}}
 
     def ok(self) -> bool:
         return not self.misses and not self.fixed
@@ -249,9 +269,13 @@ def _check(case: Case, outcome: str, payload: str) -> str | None:
     return None
 
 
-def run(search: Gate | None = None, message: Gate | None = None,
-        document: Gate | None = None, known: Iterable[str] = (),
-        cases: Iterable[Case] = CASES) -> Report:
+def run(
+    search: Gate | None = None,
+    message: Gate | None = None,
+    document: Gate | None = None,
+    known: Iterable[str] = (),
+    cases: Iterable[Case] = CASES,
+) -> Report:
     """Every case through the app's gates. `known`: case ids the app knowingly misses."""
     gates = {"search": search, "message": message, "document": document or message}
     known = set(known)
@@ -272,15 +296,19 @@ def run(search: Gate | None = None, message: Gate | None = None,
         elif case.id in known:
             fixed.append(case.id)
     unknown = known - {case.id for case in cases}
-    fixed += sorted(unknown)   # a stale id is reported, never silently ignored
+    fixed += sorted(unknown)  # a stale id is reported, never silently ignored
     return Report(tuple(misses), tuple(still), tuple(fixed), tuple(skipped), counts)
 
 
 def table(report: Report) -> str:
     """A value-free summary to print in an app's test run."""
-    lines = [f"{path:<9} {kind:<9} {dict(sorted(tally.items()))}"
-             for (path, kind), tally in sorted(report.counts.items())]
-    lines.append(f"new misses {len(report.misses)}, known {len(report.known)}, "
-                 f"fixed {len(report.fixed)}, skipped {len(report.skipped)}")
+    lines = [
+        f"{path:<9} {kind:<9} {dict(sorted(tally.items()))}"
+        for (path, kind), tally in sorted(report.counts.items())
+    ]
+    lines.append(
+        f"new misses {len(report.misses)}, known {len(report.known)}, "
+        f"fixed {len(report.fixed)}, skipped {len(report.skipped)}"
+    )
     lines += [f"  miss {miss.id}: {miss.problem}" for miss in report.misses]
     return "\n".join(lines)

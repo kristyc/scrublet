@@ -12,14 +12,14 @@ here, not in one app.
 
 ## Decision
 
-`tacitkit.bench` (the `python -m tacitkit.bench` command) is a harness, not a detector.
+`scrublet_pii.bench` (the `python -m scrublet_pii.bench` command) is a harness, not a detector.
 
 - **Corpus (`cases`).** 1,430 labelled synthetic cases, 13 categories of 110: names in English,
   Malay, Chinese (Latin letters and characters) and Indian forms; ALL-CAPS statement names; names
   split across lines, cut off and glued; organisations; places; statement rows; facts that must
   survive; shops named after people. Seeded; `corpus_hash` is stored with every result so runs
   on different corpora are never compared. No real person, account or number. It is separate
-  from `tacitkit.corpus`, which tests gates; this one measures detectors.
+  from `scrublet_pii.corpus`, which tests gates; this one measures detectors.
 - **Adapters (`adapters`).** A `Spec` per model: where it comes from (repo and pinned commit),
   precision, licence, and what the licence means in plain words (bundle it, or an optional
   download only). A loader per kind turns it into `detect(text) -> spans`. Third-party packages

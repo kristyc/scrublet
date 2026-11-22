@@ -48,7 +48,7 @@ def index(folder: Path) -> Path:
     lines = [
         "# Bench results",
         "",
-        "Every `python -m tacitkit.bench bakeoff` run appends here (this table is rebuilt each time). "
+        "Every `python -m scrublet_pii.bench bakeoff` run appends here (this table is rebuilt each time). "
         "Synthetic cases only. The winner is the highest names-caught model that passes the run's "
         'decision rule; "none" means no model passed, and the numbers are then for the model the '
         "report picked (or the best by names caught if it picked none).",

@@ -3,18 +3,30 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tacitkit"
-version = "0.1.0"
-description = "Keep private words out of what apps send to AI: one shared word store, detectors and matchers."
+name = "scrublet-pii"
+version = "0.7.0"
+description = "Little scrubber, big privacy: keep private words out of what apps send to AI."
 readme = "README.md"
 license = "Apache-2.0"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
+keywords = ["privacy", "pii", "redaction", "ai", "llm", "ner", "gliner"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/kristyc/scrublet"
+Source = "https://github.com/kristyc/scrublet"
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
-# bench adapters import these only when that adapter runs; nothing here is needed to import tacitkit
+# bench adapters import these only when that adapter runs; nothing here is needed to import scrublet_pii
 bench-onnx = ["onnxruntime", "tokenizers", "numpy", "huggingface_hub"]
 bench-torch = ["torch", "transformers>=4.50,<5", "huggingface_hub", "protobuf", "sentencepiece"]
 bench-gliner = ["gliner", "torch", "transformers>=4.50,<5", "onnxruntime", "onnx", "onnxscript",
@@ -22,7 +34,8 @@ bench-gliner = ["gliner", "torch", "transformers>=4.50,<5", "onnxruntime", "onnx
 bench-presidio = ["presidio-analyzer", "spacy"]
 
 [project.scripts]
-tacitkit = "tacitkit.terms:main"
+scrublet = "scrublet_pii.terms:main"
+tacitkit = "scrublet_pii.terms:main"   # deprecated alias, removed in v0.8.0
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -40,4 +53,6 @@ ignore = ["PLR2004"]
 
 [tool.ruff.lint.per-file-ignores]
 # the bench report and adapters are data-heavy: many parameters, long prose strings
-"src/tacitkit/bench/*" = ["E501", "PLR0912", "PLR0913", "PLR0915", "PLR0917"]
+"tests/test_guard.py" = ["E501"]   # long one-line child-process snippets
+"src/scrublet_pii/patterns.py" = ["E501"]   # one long key-block regex
+"src/scrublet_pii/bench/*" = ["E501", "PLR0912", "PLR0913", "PLR0915", "PLR0917"]

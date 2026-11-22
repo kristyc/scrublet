@@ -1,12 +1,15 @@
 """The shared corpus and its runner: the data is sound and the runner never passes a leak."""
+
 import re
 
-from tacitkit import corpus
+from scrublet_pii import corpus
 
 
 def luhn(digits: str) -> bool:
-    total = sum(int(d) if n % 2 == 0 else sum(divmod(int(d) * 2, 10))
-                for n, d in enumerate(reversed(digits)))
+    total = sum(
+        int(d) if n % 2 == 0 else sum(divmod(int(d) * 2, 10))
+        for n, d in enumerate(reversed(digits))
+    )
     return total % 10 == 0
 
 
@@ -48,8 +51,10 @@ def hiding(text):
 
 
 def test_a_sound_gate_has_no_misses_and_every_path_runs():
-    report = corpus.run(search=perfect, message=lambda t: ("hidden", "[x]")
-                        if perfect(t)[0] == "refused" else ("sent", t))
+    report = corpus.run(
+        search=perfect,
+        message=lambda t: ("hidden", "[x]") if perfect(t)[0] == "refused" else ("sent", t),
+    )
     assert report.ok() and report.skipped == () and report.known == ()
     assert "new misses 0" in corpus.table(report)
 
@@ -57,9 +62,9 @@ def test_a_sound_gate_has_no_misses_and_every_path_runs():
 def test_leaks_wrong_outcomes_and_lost_facts_are_misses_and_name_no_payload():
     report = corpus.run(search=hiding, message=hiding)
     problems = {miss.id: miss.problem for miss in report.misses}
-    assert problems["search.everyday.0"] == "outcome:hidden"          # a search was changed
-    assert problems["message.hard.password"] == "leaked"              # letters survived
-    assert "message.hard.card" not in problems                        # digits all hidden
+    assert problems["search.everyday.0"] == "outcome:hidden"  # a search was changed
+    assert problems["message.hard.password"] == "leaked"  # letters survived
+    assert "message.hard.card" not in problems  # digits all hidden
     assert problems["document.facts.0"] == "lost a fact"
     assert problems["search.never.0"] == "outcome:sent"
     assert all("Melati" not in line for line in corpus.table(report).splitlines()[1:])
