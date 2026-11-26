@@ -121,6 +121,20 @@ scrublet status
 scrublet import-words <path-to-a-json-list> --id <import-id>
 ```
 
+**Reversible redaction.** Send the AI tokens, then act on the real values in its answer
+(ADR 0008). The token map is plain data your app stores, encrypted; Scrublet never keeps it.
+
+```python
+from scrublet_pii import reversible
+
+text, job = reversible.redact("I'll email Phoebe tomorrow.", None)   # "[PERSON_1]"
+more, job = reversible.redact("Phoebe's reply came in.", job)        # same token
+answer = reversible.restore(ai_answer, job)                          # real values back
+```
+
+Unknown tokens in the answer are left as they are; a payload that would still hold a mapped
+value raises `reversible.Leaked`.
+
 ## The production guard
 
 The real profile store is shared by every app on the machine, so a test run or a stray script
