@@ -127,13 +127,14 @@ scrublet import-words <path-to-a-json-list> --id <import-id>
 ```python
 from scrublet_pii import reversible
 
-text, job = reversible.redact("I'll email Phoebe tomorrow.", None)   # "[PERSON_1]"
+text, job = reversible.redact("I'll email Phoebe tomorrow.", None)   # "[PERSON_1_k3f9qz]"
 more, job = reversible.redact("Phoebe's reply came in.", job)        # same token
-answer = reversible.restore(ai_answer, job)                          # real values back
+greeting = reversible.restore(ai_answer, job, only={"PERSON"})       # chosen kinds only
 ```
 
-Unknown tokens in the answer are left as they are; a payload that would still hold a mapped
-value raises `reversible.Leaked`.
+Tokens carry a random per-job nonce. Unknown tokens, tokens of kinds not in `only` and tokens
+inside a link stay as they are; a payload that would still hold a mapped value raises
+`reversible.Leaked`.
 
 ## The production guard
 
